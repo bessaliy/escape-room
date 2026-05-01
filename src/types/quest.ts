@@ -10,7 +10,7 @@ export type Quest = {
   previewImgWebp: string;
   level: QuestLevel;
   type: QuestType;
-  peopleMinMax: number[];
+  peopleMinMax: [number, number];
 };
 
 export type DetailedQuest = Quest & {

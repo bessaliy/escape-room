@@ -1,33 +1,60 @@
-import {ReactElement} from 'react';
+import {ReactElement, useEffect} from 'react';
+import {Link, useParams} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch} from '../../../store';
+import {getDetailedQuest} from '../../../store/selectors.ts';
+import {QUEST_FILTER, AppRoute, LEVEL_LABELS} from '../../../const.ts';
+import {fetchDetailedQuest} from '../../../store/api-actions.ts';
 
 function QuestPage(): ReactElement {
+  const {id} = useParams<{id: string}>();
+  const dispatch = useDispatch<AppDispatch>();
+  const detailedQuest = useSelector(getDetailedQuest);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchDetailedQuest(id));
+    }
+  }, [id, dispatch]);
+
+  if (!id) {
+    return <Navigate to={AppRoute.NotFound} />;
+  }
+
+  if (!detailedQuest) {
+    return <div>Loading...</div>;
+  }
+  const [peopleMin, peopleMax] = detailedQuest.peopleMinMax;
   return (
     <main className="decorated-page quest-page">
       <div className="decorated-page__decor" aria-hidden="true">
         <picture>
-          <source type="image/webp" srcSet="/img/content/maniac/maniac-size-m.webp, /img/content/maniac/maniac-size-m@2x.webp 2x" />
-          <img src="/img/content/maniac/maniac-size-m.jpg" srcSet="/img/content/maniac/maniac-size-m@2x.jpg 2x" width="1366" height="768" alt="" />
+          <source type="image/webp" srcSet={detailedQuest.coverImgWebp} />
+          <img src={detailedQuest.coverImg} width="1366" height="768" alt="" />
         </picture>
       </div>
       <div className="container container--size-l">
         <div className="quest-page__content">
-          <h1 className="title title--size-l title--uppercase quest-page__title">Маньяк</h1>
-          <p className="subtitle quest-page__subtitle"><span className="visually-hidden">Жанр:</span>Ужасы
+          <h1 className="title title--size-l title--uppercase quest-page__title">{detailedQuest.title}</h1>
+          <p className="subtitle quest-page__subtitle"><span className="visually-hidden">Жанр:</span>{QUEST_FILTER[detailedQuest.type].label}
           </p>
           <ul className="tags tags--size-l quest-page__tags">
             <li className="tags__item">
               <svg width="11" height="14" aria-hidden="true">
                 <use href="#icon-person"></use>
-              </svg>3&ndash;6&nbsp;чел
+              </svg>
+              {peopleMin}&ndash;{peopleMax}&nbsp;чел
             </li>
             <li className="tags__item">
               <svg width="14" height="14" aria-hidden="true">
                 <use href="#icon-level"></use>
-              </svg>Средний
+              </svg>
+              {LEVEL_LABELS[detailedQuest.level]}
             </li>
           </ul>
-          <p className="quest-page__description">В&nbsp;комнате с&nbsp;приглушённым светом несколько человек, незнакомых друг с&nbsp;другом, приходят в&nbsp;себя. Никто не&nbsp;помнит, что произошло прошлым вечером. Руки и&nbsp;ноги связаны, но&nbsp;одному из&nbsp;вас получилось освободиться. На&nbsp;стене висит пугающий таймер и&nbsp;запущен отсчёт 60&nbsp;минут. Сможете&nbsp;ли вы&nbsp;разобраться в&nbsp;стрессовой ситуации, помочь другим, разобраться что произошло и&nbsp;выбраться из&nbsp;комнаты?</p>
-          <a className="btn btn--accent btn--cta quest-page__btn" href="/">Забронировать</a>
+          <p className="quest-page__description">{detailedQuest.description}</p>
+          <Link className="btn btn--accent btn--cta quest-page__btn" to={`/quest/${id}/booking`}>Забронировать</Link>
         </div>
       </div>
     </main>
