@@ -1,6 +1,18 @@
 import {ReactElement} from 'react';
+// import {useEffect} from 'react';
+// import {AppDispatch, RootState} from '../../../store';
+// import {useDispatch, useSelector} from 'react-redux';
+// import {fetchQuests} from '../../../store/api-actions.ts';
 
 function MainPage(): ReactElement {
+  // const dispatch = useDispatch<AppDispatch>();
+  //
+  // useEffect(() => {
+  //   dispatch(fetchQuests());
+  // }, [dispatch]);
+  //
+  // const {quests, isLoading, error} = useSelector((state: RootState) => state.quests);
+
   return (
     <main className="page-content container">
       <div className="page-content__title-wrapper">
