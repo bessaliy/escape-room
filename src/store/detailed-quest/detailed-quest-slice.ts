@@ -30,6 +30,7 @@ const detailedQuestSlice = createSlice({
         state.isQuestLoading = false;
       })
       .addCase(fetchDetailedQuest.rejected, (state, action) => {
+        state.detailedQuest = null;
         state.isQuestLoading = false;
         state.error = action.error.message || 'Ошибка загрузки';
       });

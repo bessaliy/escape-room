@@ -1,11 +1,11 @@
 export enum AppRoute {
   Catalogue = '/',
-  Quest = 'quest/:id',
-  Contacts = 'contacts',
-  Login = 'login',
-  Booking = 'quest/:id/booking',
-  MyQuests = 'my-quests',
-  NotFound = '404',
+  Quest = '/quest/:id',
+  Contacts = '/contacts',
+  Login = '/login',
+  Booking = '/quest/:id/booking',
+  MyQuests = '/my-quests',
+  NotFound = '/404',
   Fallback = '*'
 }
 
@@ -14,7 +14,9 @@ export const API_CONFIG = {
   RequestTimeout: 5000,
 } as const;
 
-export const TOKEN_KEY = 'token';
+export const TOKEN_KEY_STORAGE = 'token';
+
+export const TOKEN_KEY_SERVER = 'X-Token';
 
 export const QUEST_LEVELS = {
   Easy: 'easy',
@@ -80,3 +82,12 @@ export enum AuthStatus {
   NoAuth = 'NO_AUTH',
   Unknown = 'UNKNOWN'
 }
+
+
+export const PASSWORD_LENGTH = {
+  MIN: 3,
+  MAX: 15,
+} as const;
+
+export const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const validPassword = /^(?=.*[a-zA-Z])(?=.*\d).+$/;

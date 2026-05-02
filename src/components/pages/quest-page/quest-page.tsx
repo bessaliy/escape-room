@@ -22,9 +22,10 @@ function QuestPage(): ReactElement {
     return <Navigate to={AppRoute.NotFound} />;
   }
 
-  if (!detailedQuest) {
+  if (!detailedQuest || detailedQuest.id !== id) {
     return <div>Loading...</div>;
   }
+
   const [peopleMin, peopleMax] = detailedQuest.peopleMinMax;
   return (
     <main className="decorated-page quest-page">
