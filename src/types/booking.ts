@@ -1,8 +1,8 @@
 import {BOOKING_DATES} from '../const.ts';
 
-type BookingDate = typeof BOOKING_DATES[keyof typeof BOOKING_DATES];
+export type BookingDate = typeof BOOKING_DATES[keyof typeof BOOKING_DATES];
 
-type SlotInfo = {
+export type SlotInfo = {
   time: string;
   isAvailable: boolean;
 };

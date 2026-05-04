@@ -6,6 +6,7 @@ import {AppDispatch} from '../../../store';
 import {getDetailedQuest} from '../../../store/selectors.ts';
 import {QUEST_FILTER, AppRoute, LEVEL_LABELS} from '../../../const.ts';
 import {fetchDetailedQuest} from '../../../store/api-actions.ts';
+import Spinner from '../../ui/spinner/spinner.tsx';
 
 function QuestPage(): ReactElement {
   const {id} = useParams<{id: string}>();
@@ -23,7 +24,7 @@ function QuestPage(): ReactElement {
   }
 
   if (!detailedQuest || detailedQuest.id !== id) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
 
   const [peopleMin, peopleMax] = detailedQuest.peopleMinMax;

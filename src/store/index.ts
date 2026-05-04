@@ -1,5 +1,6 @@
 import {configureStore} from '@reduxjs/toolkit';
 import {createAPI} from '../services/api.ts';
+import 'leaflet/dist/leaflet.css';
 
 import {rootReducer} from './root-reducer.ts';
 

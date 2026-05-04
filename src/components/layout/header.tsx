@@ -10,6 +10,7 @@ function Header(): ReactElement {
   const authStatus = useSelector(getAuthStatus);
   const location = useLocation();
   const isLoginPage = location.pathname.includes(AppRoute.Login);
+  const isMainPage = location.pathname === (AppRoute.Catalogue);
   const isLoggedIn = authStatus === AuthStatus.Auth;
   const dispatch = useDispatch<AppDispatch>();
 
@@ -20,11 +21,24 @@ function Header(): ReactElement {
   return (
     <header className="header">
       <div className="container container--size-l">
-        <span className="logo header__logo">
-          <svg width="134" height="52" aria-hidden="true">
-            <use href="#logo"></use>
-          </svg>
-        </span>
+        {isMainPage ? (
+          <span className="logo header__logo">
+            <svg width="134" height="52" aria-hidden="true">
+              <use href="#logo"></use>
+            </svg>
+          </span>
+        ) : (
+          <NavLink
+            className="logo header__logo"
+            to={AppRoute.Catalogue}
+            aria-label='Перейти на Главную'
+          >
+            <svg width="134" height="52" aria-hidden="true">
+              <use href="#logo"></use>
+            </svg>
+          </NavLink>
+        )}
+
         <nav className="main-nav header__main-nav">
           <ul className="main-nav__list">
             <li className="main-nav__item">

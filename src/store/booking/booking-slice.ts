@@ -1,23 +1,51 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {Reservation} from '../../types/reservation.ts';
+import {Booking} from '../../types/booking.ts';
+import {fetchBookingSlots, sendBooking} from '../api-actions.ts';
 
 type BookingState = {
-  bookings: Reservation[];
+  bookings: Booking[];
+  error: string | null;
+  isLoading: boolean;
+  isSending: boolean;
 }
 
 const initialState: BookingState = {
   bookings: [],
+  error: null,
+  isLoading: false,
+  isSending: false,
 };
 
 const bookingSlice = createSlice({
   name: 'booking',
   initialState,
   reducers: {},
-  // extraReducers: (builder) => {
-  //   builder.addCase( () => {
-  //
-  //   });
-  // },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchBookingSlots.pending, (state) => {
+        state.bookings = [];
+        state.error = null;
+        state.isLoading = true;
+      })
+      .addCase(fetchBookingSlots.fulfilled, (state, action) => {
+        state.bookings = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(fetchBookingSlots.rejected, (state) => {
+        state.error = 'Не могу загрузить информацию о бронировании';
+        state.isLoading = false;
+      })
+      .addCase(sendBooking.pending, (state) => {
+        state.isSending = true;
+      })
+      .addCase(sendBooking.fulfilled, (state) => {
+        state.isSending = false;
+      })
+      .addCase(sendBooking.rejected, (state) => {
+        state.isSending = false;
+        state.error = 'Не удалось отправить бронирование';
+      });
+  },
 });
 
 export default bookingSlice.reducer;

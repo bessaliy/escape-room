@@ -1,3 +1,5 @@
+import {Booking as BookingType} from './types/booking.ts';
+
 export enum AppRoute {
   Catalogue = '/',
   Quest = '/quest/:id',
@@ -28,6 +30,11 @@ export const LEVEL_LABELS = {
   easy: 'Простой',
   medium: 'Средний',
   hard: 'Сложный',
+} as const;
+
+export const DAYS_LABELS = {
+  today: 'Сегодня',
+  tomorrow: 'Завтра',
 } as const;
 
 export const LEVEL_FILTER_TYPES = {
@@ -91,3 +98,22 @@ export const PASSWORD_LENGTH = {
 
 export const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const validPassword = /^(?=.*[a-zA-Z])(?=.*\d).+$/;
+export const validName = /^[А-Яа-яЁёA-Za-z' -]{1,}$/;
+export const validPhone = /[0-9]{10,}/;
+
+export const MAP_DEFAULT_COORDINATES = [59.93, 30.31];
+
+export const CONTACT_ADDRESS: BookingType[] = [{
+  id: 'static',
+  location: {
+    'address': 'Набережная реки Карповка, д 5П',
+    'coords': [
+      59.968322,
+      30.317359
+    ],
+  },
+  'slots': {
+    today: [],
+    tomorrow: [],
+  }
+}];

@@ -7,6 +7,7 @@ import {login} from '../../../store/api-actions.ts';
 import {AppRoute, AuthStatus, PASSWORD_LENGTH, validEmail, validPassword} from '../../../const.ts';
 import {Navigate} from 'react-router-dom';
 import {getAuthStatus} from '../../../store/selectors.ts';
+import Spinner from '../../ui/spinner/spinner.tsx';
 function LoginPage(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
   const authStatus = useSelector(getAuthStatus);
@@ -19,7 +20,7 @@ function LoginPage(): ReactElement {
   } = useForm<LoginForm>();
 
   if (authStatus === AuthStatus.Unknown) {
-    return <p>Загрузка...</p>;
+    return <Spinner />;
   }
 
   if (authStatus === AuthStatus.Auth) {
@@ -51,7 +52,9 @@ function LoginPage(): ReactElement {
           <form
             className="login-form"
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-            onSubmit={handleSubmit(handleFormSubmit)}
+            onSubmit={(evt) => {
+              handleSubmit(handleFormSubmit)(evt);
+            }}
             noValidate
           >
             <div className="login-form__inner-wrapper">
@@ -63,7 +66,6 @@ function LoginPage(): ReactElement {
                     type='email'
                     id='email'
                     placeholder='Адрес электронной почты'
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     {...register('email', {
                       required: 'Введите e-mail',
                       pattern: {
