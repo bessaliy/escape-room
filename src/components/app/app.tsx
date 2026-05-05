@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import {ReactElement, useEffect} from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PrivateRoute from '../private-route/private-route.tsx';
 import {Navigate} from 'react-router-dom';
@@ -14,8 +14,15 @@ import LoginPage from '../pages/login-page/login-page.tsx';
 import MyQuestsPage from '../pages/my-quests-page/my-quests-page.tsx';
 
 import { AppRoute } from '../../const.ts';
+import {useDispatch} from 'react-redux';
+import {AppDispatch} from '../../store';
+import {checkAuth} from '../../store/api-actions.ts';
 
 function App(): ReactElement {
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, []);
   return (
     <BrowserRouter>
       <Routes>

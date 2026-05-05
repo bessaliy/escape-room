@@ -1,16 +1,115 @@
-import {ReactElement} from 'react';
+import {ReactElement, useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  getBookingSendingState,
+  getBookingSlots,
+  getBookingSlotsLoading,
+  getDetailedQuest
+} from '../../../store/selectors.ts';
+import {useNavigate, useParams} from 'react-router-dom';
+import {AppDispatch} from '../../../store';
+import {fetchDetailedQuest, fetchBookingSlots, sendBooking} from '../../../store/api-actions.ts';
+import Spinner from '../../ui/spinner/spinner.tsx';
+import TimeSlotsList from './time-slots-list.tsx';
+import Map from '../../map/map.tsx';
+import {BookingDate, BookingRequest, Location} from '../../../types/booking.ts';
+import {BookingForm} from '../../../types/forms.ts';
+import {useForm} from 'react-hook-form';
+import {AppRoute, validName, validPhone} from '../../../const.ts';
 
 function BookingPage(): ReactElement {
+  const {id} = useParams<{id: string}>();
+  const detailedQuest = useSelector(getDetailedQuest);
+  const allBookingSlots = useSelector(getBookingSlots);
+  const isLoading = useSelector(getBookingSlotsLoading);
+  const isSending = useSelector(getBookingSendingState);
+
+  const [activeLocation, setActiveLocation] = useState<Location | null>(null);
+  const selectedSlot = allBookingSlots.find((slot) => slot.location.address === activeLocation?.address) ?? allBookingSlots[0];
+
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: {errors},
+    resetField,
+    setValue
+  } = useForm<BookingForm>();
+
+  useEffect(() => {
+    if (!detailedQuest || detailedQuest.id !== id) {
+      if (id) {
+        dispatch(fetchDetailedQuest(id));
+      }
+    }
+  }, [id, detailedQuest, dispatch]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchBookingSlots(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (allBookingSlots.length) {
+      const isValid = allBookingSlots.some(
+        (slot) => slot.location.address === activeLocation?.address
+      );
+
+      if (!isValid) {
+        setActiveLocation(allBookingSlots[0].location);
+      }
+    }
+
+    resetField('time');
+  }, [allBookingSlots, activeLocation, resetField]);
+
+  useEffect(() => {
+    if (selectedSlot) {
+      setValue('placeId', selectedSlot.id);
+    }
+  }, [selectedSlot, setValue]);
+
+  if (isLoading || !allBookingSlots.length || !detailedQuest || !id) {
+    return <Spinner />;
+  }
+  const [minPeopleCount, maxPeopleCount] = detailedQuest.peopleMinMax;
+  const handleFormSubmit = (data: BookingForm) => {
+    const [date, time] = data.time.split('|') as [BookingDate, string];
+
+    const payload: BookingRequest = {
+      date,
+      time,
+      contactPerson: data.contactPerson,
+      phone: data.phone,
+      withChildren: data.withChildren,
+      peopleCount: data.peopleCount,
+      placeId: data.placeId,
+    };
+    dispatch(sendBooking({
+      questId: id,
+      bookingData: payload,
+    }))
+      .unwrap()
+      .then(() => {
+        navigate(AppRoute.MyQuests);
+        // reset();
+      });
+  };
   return (
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
         <picture>
-          <source type="image/webp"
-            srcSet="/img/content/maniac/maniac-bg-size-m.webp, /img/content/maniac/maniac-bg-size-m@2x.webp 2x"
+          <source
+            type="image/webp"
+            srcSet={detailedQuest.coverImgWebp}
           />
           <img
-            src="/img/content/maniac/maniac-bg-size-m.jpg" srcSet="/img/content/maniac/maniac-bg-size-m@2x.jpg 2x"
+            src={detailedQuest.coverImg}
             width="1366" height="1959" alt=""
+            style={{filter: 'blur(80px)' }}
           />
         </picture>
       </div>
@@ -18,88 +117,114 @@ function BookingPage(): ReactElement {
         <div className="page-content__title-wrapper">
           <h1 className="subtitle subtitle--size-l page-content__subtitle">Бронирование квеста
           </h1>
-          <p className="title title--size-m title--uppercase page-content__title">Маньяк</p>
+          <p className="title title--size-m title--uppercase page-content__title">{detailedQuest.title}</p>
         </div>
         <div className="page-content__item">
           <div className="booking-map">
-            <div className="map">
-              <div className="map__container"></div>
-            </div>
-            <p className="booking-map__address">Вы&nbsp;выбрали: наб. реки Карповки&nbsp;5, лит&nbsp;П, м.
-              Петроградская
+            <Map
+              bookings={allBookingSlots}
+              selectedLocation={activeLocation}
+              onMarkerClick={setActiveLocation}
+            />
+            <p className="booking-map__address">Вы&nbsp;выбрали: {selectedSlot.location.address}
             </p>
           </div>
         </div>
-        <form className="booking-form" action="https://echo.htmlacademy.ru/" method="post">
-          <fieldset className="booking-form__section">
+        <form
+          className="booking-form"
+          onSubmit={(evt) => {
+            handleSubmit(handleFormSubmit)(evt);
+          }}
+          noValidate
+        >
+          <fieldset className="booking-form__section" disabled={isSending}>
             <legend className="visually-hidden">Выбор даты и времени</legend>
-            <fieldset className="booking-form__date-section">
-              <legend className="booking-form__date-title">Сегодня</legend>
-              <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today9h45m" name="date" required value="today9h45m"/>
-                  <span className="custom-radio__label">9:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today15h00m" name="date" checked required value="today15h00m"/>
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today17h30m" name="date" required value="today17h30m"/>
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today19h30m" name="date" required value="today19h30m" disabled/>
-                  <span className="custom-radio__label">19:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="today21h30m" name="date" required value="today21h30m"/>
-                  <span className="custom-radio__label">21:30</span>
-                </label>
-              </div>
-            </fieldset>
-            <fieldset className="booking-form__date-section">
-              <legend className="booking-form__date-title">Завтра</legend>
-              <div className="booking-form__date-inner-wrapper">
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow11h00m" name="date" required value="tomorrow11h00m"/>
-                  <span className="custom-radio__label">11:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow15h00m" name="date" required value="tomorrow15h00m" disabled/>
-                  <span className="custom-radio__label">15:00</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow17h30m" name="date" required value="tomorrow17h30m" disabled/>
-                  <span className="custom-radio__label">17:30</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow19h45m" name="date" required value="tomorrow19h45m"/>
-                  <span className="custom-radio__label">19:45</span>
-                </label>
-                <label className="custom-radio booking-form__date">
-                  <input type="radio" id="tomorrow21h30m" name="date" required value="tomorrow21h30m"/>
-                  <span className="custom-radio__label">21:30</span>
-                </label>
-              </div>
-            </fieldset>
+            {Object.entries(selectedSlot.slots).map(([day, items]) => (
+              <TimeSlotsList
+                key={day}
+                title={day as keyof typeof selectedSlot.slots}
+                items={items}
+                register={register}
+              />
+            ))}
           </fieldset>
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Контактная информация</legend>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="name">Ваше имя</label>
-              <input type="text" id="name" name="name" placeholder="Имя" required pattern="[А-Яа-яЁёA-Za-z'- ]{1,}"/>
+              <input
+                type="text"
+                id="name"
+                placeholder="Имя"
+                {...register('contactPerson', {
+                  required: 'Введите имя',
+                  pattern: {
+                    value: validName,
+                    message: 'Некорректное имя'
+                  }
+                })}
+              />
+              {errors.contactPerson?.message && (
+                <span style={{color: 'red'}}>
+                  {errors.contactPerson.message}
+                </span>
+              )}
             </div>
+            <input
+              type="hidden"
+              {...register('placeId')}
+            />
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="tel">Контактный телефон</label>
-              <input type="tel" id="tel" name="tel" placeholder="Телефон" required pattern="[0-9]{10,}"/>
+              <input
+                type="tel"
+                id="tel"
+                placeholder="Телефон"
+                {...register('phone', {
+                  required: 'Введите номер телефона',
+                  pattern: {
+                    value: validPhone,
+                    message: 'Неверный номер телефона'
+                  }
+                })}
+              />
+              {errors.phone?.message && (
+                <span style={{color: 'red'}}>
+                  {errors.phone.message}
+                </span>
+              )}
             </div>
             <div className="custom-input booking-form__input">
               <label className="custom-input__label" htmlFor="person">Количество участников</label>
-              <input type="number" id="person" name="person" placeholder="Количество участников" required/>
+              <input
+                type="number"
+                id="person"
+                placeholder="Количество участников"
+                {...register('peopleCount', {
+                  required: 'Введите количество участников',
+                  min: {
+                    value: minPeopleCount,
+                    message: `Минимум ${minPeopleCount} человек`,
+                  },
+                  max: {
+                    value: maxPeopleCount,
+                    message: `Максимум ${maxPeopleCount} человек`,
+                  },
+                  valueAsNumber: true,
+                })}
+              />
+              {errors.peopleCount?.message && (
+                <span style={{color: 'red'}}>
+                  {errors.peopleCount.message}
+                </span>
+              )}
             </div>
             <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--children">
-              <input type="checkbox" id="children" name="children" checked/>
+              <input
+                type="checkbox"
+                id="children"
+                {...register('withChildren')}
+              />
               <span className="custom-checkbox__icon">
                 <svg width="20" height="17" aria-hidden="true">
                   <use href="#icon-tick"></use>
@@ -108,19 +233,35 @@ function BookingPage(): ReactElement {
               <span className="custom-checkbox__label">Со&nbsp;мной будут дети</span>
             </label>
           </fieldset>
-          <button className="btn btn--accent btn--cta booking-form__submit" type="submit">Забронировать</button>
+          <button
+            className="btn btn--accent btn--cta booking-form__submit"
+            type="submit"
+          >
+            {isSending ? 'Отправка...' : 'Забронировать'}
+          </button>
           <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--agreement">
-            <input type="checkbox" id="id-order-agreement" name="user-agreement" required/>
+            <input
+              type="checkbox"
+              id="id-order-agreement"
+              {...register('agreement', {
+                required: 'Подтвердите, что согласны с правилами',
+              })}
+            />
             <span className="custom-checkbox__icon">
               <svg width="20" height="17" aria-hidden="true">
                 <use href="#icon-tick"></use>
               </svg>
             </span>
-            <span className="custom-checkbox__label">Я&nbsp;согласен с
+            <span className="custom-checkbox__label">Я&nbsp;согласен с&nbsp;
               <a className="link link--active-silver link--underlined" href="#">правилами обработки персональных данных</a>
             &nbsp;и пользовательским соглашением
             </span>
           </label>
+          {errors.agreement?.message && (
+            <span style={{color: 'red'}}>
+              {errors.agreement.message}
+            </span>
+          )}
         </form>
       </div>
     </main>

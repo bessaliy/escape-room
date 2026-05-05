@@ -6,6 +6,7 @@ import {AppDispatch} from '../../../store';
 import {getDetailedQuest} from '../../../store/selectors.ts';
 import {QUEST_FILTER, AppRoute, LEVEL_LABELS} from '../../../const.ts';
 import {fetchDetailedQuest} from '../../../store/api-actions.ts';
+import Spinner from '../../ui/spinner/spinner.tsx';
 
 function QuestPage(): ReactElement {
   const {id} = useParams<{id: string}>();
@@ -22,16 +23,22 @@ function QuestPage(): ReactElement {
     return <Navigate to={AppRoute.NotFound} />;
   }
 
-  if (!detailedQuest) {
-    return <div>Loading...</div>;
+  if (!detailedQuest || detailedQuest.id !== id) {
+    return <Spinner />;
   }
+
   const [peopleMin, peopleMax] = detailedQuest.peopleMinMax;
   return (
     <main className="decorated-page quest-page">
       <div className="decorated-page__decor" aria-hidden="true">
         <picture>
           <source type="image/webp" srcSet={detailedQuest.coverImgWebp} />
-          <img src={detailedQuest.coverImg} width="1366" height="768" alt="" />
+          <img
+            src={detailedQuest.coverImg}
+            width="1366"
+            height="768"
+            alt={detailedQuest.title}
+          />
         </picture>
       </div>
       <div className="container container--size-l">

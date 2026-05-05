@@ -1,4 +1,6 @@
 import {ReactElement} from 'react';
+import {CONTACT_ADDRESS} from '../../../const.ts';
+import Map from '../../map/map.tsx';
 
 function ContactsPage(): ReactElement {
   return (
@@ -24,7 +26,7 @@ function ContactsPage(): ReactElement {
             <div className="contacts__item">
               <dt className="contacts__dt">Адрес</dt>
               <dd className="contacts__dd">
-                <address className="contacts__address">Санкт-Петербург,<br/> Набережная реки Карповка, д 5П</address>
+                <address className="contacts__address">Санкт-Петербург,<br/> {CONTACT_ADDRESS[0].location.address}</address>
               </dd>
             </div>
             <div className="contacts__item">
@@ -46,6 +48,9 @@ function ContactsPage(): ReactElement {
           </dl>
           <div className="contacts__map">
             <div className="map">
+              <Map
+                bookings={CONTACT_ADDRESS}
+              />
               <div className="map__container"></div>
             </div>
           </div>
