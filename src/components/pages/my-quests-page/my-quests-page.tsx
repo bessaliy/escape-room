@@ -11,7 +11,7 @@ function MyQuestsPage(): ReactElement {
 
   useEffect(() => {
     dispatch(fetchReservations());
-  }, []);
+  }, [dispatch]);
 
   return (
     <main className="page-content decorated-page">

@@ -64,7 +64,7 @@ function BookingPage(): ReactElement {
     }
 
     resetField('time');
-  }, [allBookingSlots]);
+  }, [allBookingSlots, activeLocation, resetField]);
 
   useEffect(() => {
     if (selectedSlot) {
