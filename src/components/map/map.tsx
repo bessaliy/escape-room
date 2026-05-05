@@ -50,7 +50,6 @@ function Map({bookings, selectedLocation, onMarkerClick}: MapProps): ReactElemen
     });
     leaflet
       .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
       })
       .addTo(map);
 
