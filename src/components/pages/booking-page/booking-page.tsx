@@ -158,7 +158,9 @@ function BookingPage(): ReactElement {
         </div>
         <form
           className="booking-form"
-          onSubmit={handleSubmit(handleFormSubmit)}
+          onSubmit={(evt) => {
+            void handleSubmit(handleFormSubmit)(evt);
+          }}
           noValidate
         >
           <fieldset className="booking-form__section" disabled={isSending}>

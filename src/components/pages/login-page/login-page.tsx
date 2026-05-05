@@ -62,7 +62,9 @@ function LoginPage(): ReactElement {
         <div className="login__form">
           <form
             className="login-form"
-            onSubmit={handleSubmit(handleFormSubmit)}
+            onSubmit={(evt) => {
+              void handleSubmit(handleFormSubmit)(evt);
+            }}
             noValidate
           >
             <div className="login-form__inner-wrapper">
