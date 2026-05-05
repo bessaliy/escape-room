@@ -33,7 +33,12 @@ function QuestPage(): ReactElement {
       <div className="decorated-page__decor" aria-hidden="true">
         <picture>
           <source type="image/webp" srcSet={detailedQuest.coverImgWebp} />
-          <img src={detailedQuest.coverImg} width="1366" height="768" alt="" />
+          <img
+            src={detailedQuest.coverImg}
+            width="1366"
+            height="768"
+            alt={detailedQuest.title}
+          />
         </picture>
       </div>
       <div className="container container--size-l">

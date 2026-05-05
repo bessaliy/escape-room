@@ -6,7 +6,7 @@ import {
   getBookingSlotsLoading,
   getDetailedQuest
 } from '../../../store/selectors.ts';
-import {useParams} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {AppDispatch} from '../../../store';
 import {fetchDetailedQuest, fetchBookingSlots, sendBooking} from '../../../store/api-actions.ts';
 import Spinner from '../../ui/spinner/spinner.tsx';
@@ -15,7 +15,7 @@ import Map from '../../map/map.tsx';
 import {BookingDate, BookingRequest, Location} from '../../../types/booking.ts';
 import {BookingForm} from '../../../types/forms.ts';
 import {useForm} from 'react-hook-form';
-import {validName, validPhone} from '../../../const.ts';
+import {AppRoute, validName, validPhone} from '../../../const.ts';
 
 function BookingPage(): ReactElement {
   const {id} = useParams<{id: string}>();
@@ -28,13 +28,14 @@ function BookingPage(): ReactElement {
   const selectedSlot = allBookingSlots.find((slot) => slot.location.address === activeLocation?.address) ?? allBookingSlots[0];
 
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: {errors},
-    reset,
     resetField,
+    setValue
   } = useForm<BookingForm>();
 
   useEffect(() => {
@@ -65,6 +66,12 @@ function BookingPage(): ReactElement {
     resetField('time');
   }, [allBookingSlots]);
 
+  useEffect(() => {
+    if (selectedSlot) {
+      setValue('placeId', selectedSlot.id);
+    }
+  }, [selectedSlot, setValue]);
+
   if (isLoading || !allBookingSlots.length || !detailedQuest || !id) {
     return <Spinner />;
   }
@@ -81,26 +88,28 @@ function BookingPage(): ReactElement {
       peopleCount: data.peopleCount,
       placeId: data.placeId,
     };
-
     dispatch(sendBooking({
       questId: id,
       bookingData: payload,
     }))
       .unwrap()
       .then(() => {
-        reset();
+        navigate(AppRoute.MyQuests);
+        // reset();
       });
   };
   return (
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
         <picture>
-          <source type="image/webp"
+          <source
+            type="image/webp"
             srcSet={detailedQuest.coverImgWebp}
           />
           <img
             src={detailedQuest.coverImg}
             width="1366" height="1959" alt=""
+            style={{filter: 'blur(80px)' }}
           />
         </picture>
       </div>
@@ -163,7 +172,6 @@ function BookingPage(): ReactElement {
             </div>
             <input
               type="hidden"
-              value={selectedSlot.id}
               {...register('placeId')}
             />
             <div className="custom-input booking-form__input">
