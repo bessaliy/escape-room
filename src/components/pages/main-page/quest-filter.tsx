@@ -1,6 +1,12 @@
 import {ReactElement} from 'react';
 import {LEVEL_FILTER_TYPES, QUEST_FILTER} from '../../../const.ts';
 
+type QuestFilterProps = {
+  activeType : string;
+  activeLevel : string;
+  onTypeChange: (type: string) => void;
+  onLevelChange: (type: string) => void;
+};
 
 const levelsFilterOptions = Object.entries(LEVEL_FILTER_TYPES).map(
   ([type, label]) => ({
@@ -16,16 +22,9 @@ const questsFilterOptions = Object.entries(QUEST_FILTER).map(
   })
 );
 
-type QuestFilterProps = {
-  activeType : string;
-  activeLevel : string;
-  onTypeChange: (type: string) => void;
-  onLevelChange: (type: string) => void;
-};
-
 function QuestFilter({activeType, activeLevel, onTypeChange, onLevelChange}: QuestFilterProps):ReactElement {
   return (
-    <form className="filter" action="#" method="get">
+    <div className="filter">
       <fieldset className="filter__section">
         <legend className="visually-hidden">Тематика</legend>
         <ul className="filter__list">
@@ -71,7 +70,7 @@ function QuestFilter({activeType, activeLevel, onTypeChange, onLevelChange}: Que
           ))}
         </ul>
       </fieldset>
-    </form>
+    </div>
   );
 }
 

@@ -47,12 +47,9 @@ function ContactsPage(): ReactElement {
             </div>
           </dl>
           <div className="contacts__map">
-            <div className="map">
-              <Map
-                bookings={CONTACT_ADDRESS}
-              />
-              <div className="map__container"></div>
-            </div>
+            <Map
+              bookings={CONTACT_ADDRESS}
+            />
           </div>
         </div>
       </div>

@@ -10,13 +10,13 @@ type MapProps = {
 }
 
 const defaultIcon = leaflet.icon({
-  iconUrl: '../../public/img/svg/pin-default.svg',
+  iconUrl: '/img/svg/pin-default.svg',
   iconSize: [27, 39],
   iconAnchor: [13, 39],
 });
 
 const activeIcon = leaflet.icon({
-  iconUrl: '../../public/img/svg/pin-active.svg',
+  iconUrl: '/img/svg/pin-active.svg',
   iconSize: [27, 39],
   iconAnchor: [13, 39],
 });
@@ -37,7 +37,7 @@ function Map({bookings, selectedLocation, onMarkerClick}: MapProps): ReactElemen
       [defaultCoords[0], defaultCoords[1]],
       10
     );
-  }, []);
+  }, [defaultCoords]);
 
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) {
@@ -62,7 +62,7 @@ function Map({bookings, selectedLocation, onMarkerClick}: MapProps): ReactElemen
       leafletMapRef.current = null;
     };
 
-  }, []);
+  }, [defaultCoords]);
 
   useEffect(() => {
     const layer = markersLayerRef.current;
@@ -85,7 +85,7 @@ function Map({bookings, selectedLocation, onMarkerClick}: MapProps): ReactElemen
 
       marker.addTo(layer);
     });
-  }, [bookings, selectedLocation]);
+  }, [bookings, selectedLocation, onMarkerClick]);
 
   return (
     <div className='map'>

@@ -18,7 +18,11 @@ const initialState: DetailedQuestState = {
 const detailedQuestSlice = createSlice({
   name: 'detailedQuest',
   initialState,
-  reducers: {},
+  reducers: {
+    clearDetailedQuestError(state) {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDetailedQuest.pending, (state) => {
@@ -29,12 +33,13 @@ const detailedQuestSlice = createSlice({
         state.detailedQuest = action.payload;
         state.isQuestLoading = false;
       })
-      .addCase(fetchDetailedQuest.rejected, (state, action) => {
+      .addCase(fetchDetailedQuest.rejected, (state) => {
         state.detailedQuest = null;
         state.isQuestLoading = false;
-        state.error = action.error.message || 'Ошибка загрузки';
+        state.error = 'Не удалось загрузить информацию о квесте';
       });
   },
 });
 
+export const {clearDetailedQuestError} = detailedQuestSlice.actions;
 export default detailedQuestSlice.reducer;
