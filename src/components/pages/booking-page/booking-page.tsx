@@ -17,6 +17,7 @@ import {BookingForm} from '../../../types/forms.ts';
 import {useForm} from 'react-hook-form';
 import {AppRoute, VALIDATION_PATTERNS} from '../../../const.ts';
 import {clearBookingError} from '../../../store/booking/booking-slice.ts';
+import {Navigate} from 'react-router-dom';
 
 function BookingPage(): ReactElement {
   const {id} = useParams<{id: string}>();
@@ -68,7 +69,7 @@ function BookingPage(): ReactElement {
         setActiveLocation(allBookingSlots[0].location);
       }
     }
-  }, [allBookingSlots, activeLocation, resetField]);
+  }, [allBookingSlots, activeLocation]);
 
   useEffect(() => {
     if (selectedSlot) {
@@ -76,9 +77,26 @@ function BookingPage(): ReactElement {
     }
   }, [selectedSlot, setValue]);
 
-  if (isLoading || !allBookingSlots.length || !detailedQuest || !id) {
+  if (isLoading) {
     return <Spinner />;
   }
+
+  if (!detailedQuest || !id) {
+    return <Navigate to={AppRoute.NotFound} />;
+  }
+
+  if (error && !allBookingSlots.length) {
+    return <p className='title title--size-s'>{error}</p>;
+  }
+
+  if (!allBookingSlots.length) {
+    return (
+      <p className="title title--size-s">
+        Нет доступных слотов
+      </p>
+    );
+  }
+
   const [minPeopleCount, maxPeopleCount] = detailedQuest.peopleMinMax;
   const handleFormSubmit = (data: BookingForm) => {
     const [date, time] = data.time.split('|') as [BookingDate, string];
@@ -140,9 +158,7 @@ function BookingPage(): ReactElement {
         </div>
         <form
           className="booking-form"
-          onSubmit={(evt) => {
-            handleSubmit(handleFormSubmit)(evt);
-          }}
+          onSubmit={handleSubmit(handleFormSubmit)}
           noValidate
         >
           <fieldset className="booking-form__section" disabled={isSending}>
@@ -257,6 +273,7 @@ function BookingPage(): ReactElement {
           <button
             className="btn btn--accent btn--cta booking-form__submit"
             type="submit"
+            disabled={isSending}
           >
             {isSending ? 'Отправка...' : 'Забронировать'}
           </button>

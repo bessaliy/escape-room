@@ -6,7 +6,7 @@ import {AppDispatch} from '../../../store';
 import {login} from '../../../store/api-actions.ts';
 import {AppRoute, AuthStatus, PASSWORD_LENGTH, VALIDATION_PATTERNS} from '../../../const.ts';
 import {Navigate, useLocation} from 'react-router-dom';
-import {getAuthStatus} from '../../../store/selectors.ts';
+import {getAuthStatus, getLoginError, getLoginSendingState} from '../../../store/selectors.ts';
 import Spinner from '../../ui/spinner/spinner.tsx';
 
 type LocationState = {
@@ -14,18 +14,20 @@ type LocationState = {
     pathname: string;
   };
 };
+
 function LoginPage(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
   const authStatus = useSelector(getAuthStatus);
   const location = useLocation();
   const state = location.state as LocationState | null;
   const previousPage = state?.from?.pathname || AppRoute.Catalogue;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const error = useSelector(getLoginError);
+  const isSending = useSelector(getLoginSendingState);
+
   const {
     register,
     handleSubmit,
     formState: {errors}
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   } = useForm<LoginForm>();
 
   if (authStatus === AuthStatus.Unknown) {
@@ -60,10 +62,7 @@ function LoginPage(): ReactElement {
         <div className="login__form">
           <form
             className="login-form"
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-            onSubmit={(evt) => {
-              handleSubmit(handleFormSubmit)(evt);
-            }}
+            onSubmit={handleSubmit(handleFormSubmit)}
             noValidate
           >
             <div className="login-form__inner-wrapper">
@@ -83,10 +82,8 @@ function LoginPage(): ReactElement {
                       }
                     })}
                   />
-                  {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                   {errors.email?.message && (
                     <span style={{color: 'red'}}>
-                      {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                       {errors.email.message}
                     </span>
                   )}
@@ -97,7 +94,6 @@ function LoginPage(): ReactElement {
                     type="password"
                     id="password"
                     placeholder="Пароль"
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     {...register('password', {
                       required: 'Введите пароль',
                       minLength: {
@@ -114,22 +110,30 @@ function LoginPage(): ReactElement {
                       }
                     })}
                   />
-                  {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                   {errors.password?.message && (
                     <span className="form-error" style={{color: 'red'}}>
-                      {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                       {errors.password.message}
                     </span>
                   )}
                 </div>
               </div>
-              <button className="btn btn--accent btn--general login-form__submit" type="submit">Войти</button>
+              <button
+                className="btn btn--accent btn--general login-form__submit"
+                type="submit"
+                disabled={isSending}
+              >
+                {isSending ? 'Авторизация...' : 'Войти'}
+              </button>
+              {error && (
+                <p style={{ color: 'red' }}>
+                  {error}
+                </p>
+              )}
             </div>
             <label className="custom-checkbox login-form__checkbox">
               <input
                 type="checkbox"
                 id="id-order-agreement"
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 {...register('agreement', {
                   required: 'Подтвердите, что согласны с правилами'
                 })}
@@ -143,10 +147,8 @@ function LoginPage(): ReactElement {
                 <a className="link link--active-silver link--underlined" href="#">правилами обработки персональных данных</a>&nbsp;и пользовательским соглашением
               </span>
             </label>
-            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
             {errors.agreement?.message && (
               <span style={{color: 'red'}}>
-                {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                 {errors.agreement.message}
               </span>
             )}

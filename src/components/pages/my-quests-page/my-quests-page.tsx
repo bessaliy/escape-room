@@ -2,19 +2,25 @@ import {ReactElement, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch} from '../../../store';
 import {fetchReservations} from '../../../store/api-actions.ts';
-import {getReservationError, getReservations} from '../../../store/selectors.ts';
+import {getReservationError, getReservationLoading, getReservations} from '../../../store/selectors.ts';
 import ReservationCard from './reservation-card.tsx';
 import {clearReservationsError} from '../../../store/reservations/reservation-slice.ts';
+import Spinner from '../../ui/spinner/spinner.tsx';
 
 function MyQuestsPage(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
   const reservations = useSelector(getReservations);
   const error = useSelector(getReservationError);
+  const isLoading = useSelector(getReservationLoading);
 
   useEffect(() => {
     dispatch(clearReservationsError());
     dispatch(fetchReservations());
   }, [dispatch]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <main className="page-content decorated-page">

@@ -17,4 +17,10 @@ export const getBookingSendingState = (state: RootState) => state.booking.isSend
 export const getBookingSlotsError = (state: RootState) => state.booking.error;
 
 export const getReservations = (state: RootState) => state.reservation.reservations;
-export const getReservationError = (state: RootState) => state.reservation.error
+export const getReservationError = (state: RootState) => state.reservation.error;
+export const getReservationLoading = (state: RootState) => state.reservation.isLoading;
+
+export const getLoginError = (state: RootState) => state.user.loginError;
+export const getLoginSendingState = (state: RootState) => state.user.isSending;
+
+

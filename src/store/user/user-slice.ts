@@ -6,12 +6,14 @@ type UserState = {
   authStatus: AuthStatus;
   email: string | null;
   loginError: string | null;
+  isSending: boolean;
 };
 
 const initialState: UserState = {
   authStatus: AuthStatus.Unknown,
   email: null,
   loginError: null,
+  isSending: false,
 };
 
 const userSlice = createSlice({
@@ -22,13 +24,16 @@ const userSlice = createSlice({
     builder
       .addCase(login.pending, (state) => {
         state.loginError = null;
+        state.isSending = true;
       })
       .addCase(login.fulfilled, (state) => {
         state.authStatus = AuthStatus.Auth;
         state.loginError = null;
+        state.isSending = false;
       })
       .addCase(login.rejected, (state, action) => {
         state.loginError = action.payload ?? null;
+        state.isSending = false;
       })
       .addCase(logout.fulfilled, (state) => {
         state.authStatus = AuthStatus.NoAuth;

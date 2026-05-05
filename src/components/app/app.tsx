@@ -22,7 +22,7 @@ function App(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
   useEffect(() => {
     dispatch(checkAuth());
-  }, []);
+  }, [dispatch]);
   return (
     <BrowserRouter>
       <Routes>

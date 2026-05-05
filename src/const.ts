@@ -111,7 +111,7 @@ export const CONTACT_ADDRESS: BookingType[] = [{
     'coords': [
       59.968322,
       30.317359
-    ],
+    ] as [number, number],
   },
   'slots': {
     today: [],

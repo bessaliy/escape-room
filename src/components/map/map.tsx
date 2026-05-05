@@ -10,13 +10,13 @@ type MapProps = {
 }
 
 const defaultIcon = leaflet.icon({
-  iconUrl: '../../public/img/svg/pin-default.svg',
+  iconUrl: '/img/svg/pin-default.svg',
   iconSize: [27, 39],
   iconAnchor: [13, 39],
 });
 
 const activeIcon = leaflet.icon({
-  iconUrl: '../../public/img/svg/pin-active.svg',
+  iconUrl: '/img/svg/pin-active.svg',
   iconSize: [27, 39],
   iconAnchor: [13, 39],
 });

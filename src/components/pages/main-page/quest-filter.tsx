@@ -24,7 +24,7 @@ const questsFilterOptions = Object.entries(QUEST_FILTER).map(
 
 function QuestFilter({activeType, activeLevel, onTypeChange, onLevelChange}: QuestFilterProps):ReactElement {
   return (
-    <form className="filter" action="#" method="get">
+    <div className="filter">
       <fieldset className="filter__section">
         <legend className="visually-hidden">Тематика</legend>
         <ul className="filter__list">
@@ -70,7 +70,7 @@ function QuestFilter({activeType, activeLevel, onTypeChange, onLevelChange}: Que
           ))}
         </ul>
       </fieldset>
-    </form>
+    </div>
   );
 }
 
