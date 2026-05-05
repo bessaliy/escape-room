@@ -2,7 +2,7 @@ import {ReactElement, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   getBookingSendingState,
-  getBookingSlots,
+  getBookingSlots, getBookingSlotsError,
   getBookingSlotsLoading,
   getDetailedQuest
 } from '../../../store/selectors.ts';
@@ -15,7 +15,8 @@ import Map from '../../map/map.tsx';
 import {BookingDate, BookingRequest, Location} from '../../../types/booking.ts';
 import {BookingForm} from '../../../types/forms.ts';
 import {useForm} from 'react-hook-form';
-import {AppRoute, validName, validPhone} from '../../../const.ts';
+import {AppRoute, VALIDATION_PATTERNS} from '../../../const.ts';
+import {clearBookingError} from '../../../store/booking/booking-slice.ts';
 
 function BookingPage(): ReactElement {
   const {id} = useParams<{id: string}>();
@@ -29,6 +30,7 @@ function BookingPage(): ReactElement {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const error = useSelector(getBookingSlotsError);
 
   const {
     register,
@@ -53,6 +55,10 @@ function BookingPage(): ReactElement {
   }, [dispatch, id]);
 
   useEffect(() => {
+    dispatch(clearBookingError());
+  }, [dispatch]);
+
+  useEffect(() => {
     if (allBookingSlots.length) {
       const isValid = allBookingSlots.some(
         (slot) => slot.location.address === activeLocation?.address
@@ -62,8 +68,6 @@ function BookingPage(): ReactElement {
         setActiveLocation(allBookingSlots[0].location);
       }
     }
-
-    resetField('time');
   }, [allBookingSlots, activeLocation, resetField]);
 
   useEffect(() => {
@@ -95,9 +99,13 @@ function BookingPage(): ReactElement {
       .unwrap()
       .then(() => {
         navigate(AppRoute.MyQuests);
-        // reset();
       });
   };
+  const handleLocationChange = (location: Location) => {
+    setActiveLocation(location);
+    resetField('time');
+  };
+
   return (
     <main className="page-content decorated-page">
       <div className="decorated-page__decor" aria-hidden="true">
@@ -124,7 +132,7 @@ function BookingPage(): ReactElement {
             <Map
               bookings={allBookingSlots}
               selectedLocation={activeLocation}
-              onMarkerClick={setActiveLocation}
+              onMarkerClick={handleLocationChange}
             />
             <p className="booking-map__address">Вы&nbsp;выбрали: {selectedSlot.location.address}
             </p>
@@ -147,6 +155,11 @@ function BookingPage(): ReactElement {
                 register={register}
               />
             ))}
+            {errors.time?.message && (
+              <span style={{ color: 'red' }}>
+                {errors.time.message}
+              </span>
+            )}
           </fieldset>
           <fieldset className="booking-form__section">
             <legend className="visually-hidden">Контактная информация</legend>
@@ -158,8 +171,16 @@ function BookingPage(): ReactElement {
                 placeholder="Имя"
                 {...register('contactPerson', {
                   required: 'Введите имя',
+                  minLength: {
+                    value: 1,
+                    message: 'Минимум 1 символ',
+                  },
+                  maxLength: {
+                    value: 15,
+                    message: 'Максимум 15 символов',
+                  },
                   pattern: {
-                    value: validName,
+                    value: VALIDATION_PATTERNS.name,
                     message: 'Некорректное имя'
                   }
                 })}
@@ -183,7 +204,7 @@ function BookingPage(): ReactElement {
                 {...register('phone', {
                   required: 'Введите номер телефона',
                   pattern: {
-                    value: validPhone,
+                    value: VALIDATION_PATTERNS.phone,
                     message: 'Неверный номер телефона'
                   }
                 })}
@@ -239,6 +260,11 @@ function BookingPage(): ReactElement {
           >
             {isSending ? 'Отправка...' : 'Забронировать'}
           </button>
+          {error && (
+            <p style={{ color: 'red' }}>
+              {error}
+            </p>
+          )}
           <label className="custom-checkbox booking-form__checkbox booking-form__checkbox--agreement">
             <input
               type="checkbox"

@@ -6,14 +6,18 @@ import {fetchQuests} from '../../../store/api-actions.ts';
 import QuestList from './quest-list.tsx';
 import QuestFilter from './quest-filter.tsx';
 
-import {getQuests} from '../../../store/selectors.ts';
+import {getQuests, getQuestsError, getQuestsLoading} from '../../../store/selectors.ts';
+import {clearQuestsError} from '../../../store/quest/quest-slice.ts';
+import Spinner from '../../ui/spinner/spinner.tsx';
 
 function MainPage(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
+  const error = useSelector(getQuestsError);
   const [activeType, setActiveType] = useState('all');
   const [activeLevel, setActiveLevel] = useState('any');
 
   const quests = useSelector(getQuests);
+  const isLoading = useSelector(getQuestsLoading);
 
   const filteredQuests = quests.filter((quest) => {
     const matchType = activeType === 'all' || quest.type === activeType;
@@ -23,8 +27,27 @@ function MainPage(): ReactElement {
   });
 
   useEffect(() => {
+    dispatch(clearQuestsError());
     dispatch(fetchQuests());
   }, [dispatch]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  let content: ReactElement;
+
+  if (error) {
+    content = <span style={{ color: 'red', marginLeft: '500px' }}>{error}</span>;
+  } else if (!filteredQuests.length) {
+    content = (
+      <span className="title title--size-s title--uppercase">
+      Квестов, доступных по данному запросу, сейчас нет
+      </span>
+    );
+  } else {
+    content = <QuestList quests={filteredQuests} />;
+  }
 
   return (
     <main className="page-content container">
@@ -42,9 +65,8 @@ function MainPage(): ReactElement {
         />
       </div>
       <h2 className="title visually-hidden">Выберите квест</h2>
-      <QuestList
-        quests={filteredQuests}
-      />
+      {content}
+
     </main>
   );
 }

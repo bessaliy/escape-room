@@ -37,7 +37,7 @@ function Map({bookings, selectedLocation, onMarkerClick}: MapProps): ReactElemen
       [defaultCoords[0], defaultCoords[1]],
       10
     );
-  }, []);
+  }, [defaultCoords]);
 
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) {
@@ -62,7 +62,7 @@ function Map({bookings, selectedLocation, onMarkerClick}: MapProps): ReactElemen
       leafletMapRef.current = null;
     };
 
-  }, []);
+  }, [defaultCoords]);
 
   useEffect(() => {
     const layer = markersLayerRef.current;
@@ -85,7 +85,7 @@ function Map({bookings, selectedLocation, onMarkerClick}: MapProps): ReactElemen
 
       marker.addTo(layer);
     });
-  }, [bookings, selectedLocation]);
+  }, [bookings, selectedLocation, onMarkerClick]);
 
   return (
     <div className='map'>

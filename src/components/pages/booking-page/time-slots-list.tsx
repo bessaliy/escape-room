@@ -25,7 +25,7 @@ function TimeSlotsList({title, items, register}: TimeSlotsListProps): ReactEleme
               id={`${title}-${item.time}`}
               value={`${title}|${item.time}`}
               {...register('time', {
-                required: true
+                required: 'Выберите время',
               })}
               disabled={!item.isAvailable}
             />

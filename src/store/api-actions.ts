@@ -7,8 +7,6 @@ import {TOKEN_KEY_STORAGE} from '../const.ts';
 import {LoginRequest} from '../types/requests.ts';
 import {Booking, BookingRequest} from '../types/booking.ts';
 import {Reservation} from '../types/reservation.ts';
-// import {Booking, BookingRequest} from '../types/booking.ts';
-// import {User} from '../types/user.ts';
 
 export const fetchQuests = createAsyncThunk<
   Quest[],

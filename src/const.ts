@@ -90,16 +90,17 @@ export enum AuthStatus {
   Unknown = 'UNKNOWN'
 }
 
-
 export const PASSWORD_LENGTH = {
   MIN: 3,
   MAX: 15,
 } as const;
 
-export const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-export const validPassword = /^(?=.*[a-zA-Z])(?=.*\d).+$/;
-export const validName = /^[А-Яа-яЁёA-Za-z' -]{1,}$/;
-export const validPhone = /[0-9]{10,}/;
+export const VALIDATION_PATTERNS = {
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  password: /^(?=.*[a-zA-Z])(?=.*\d).+$/,
+  name: /^[А-Яа-яЁёA-Za-z' -]{1,15}$/,
+  phone: /[0-9]{10,}/
+} as const;
 
 export const MAP_DEFAULT_COORDINATES = [59.93, 30.31];
 

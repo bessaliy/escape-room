@@ -1,7 +1,13 @@
 import {RootState} from './index.ts';
 
 export const getQuests = (state: RootState) => state.quests.quests;
+export const getQuestsError = (state: RootState) => state.quests.error;
+export const getQuestsLoading = (state: RootState) => state.quests.isLoading;
+
 export const getDetailedQuest = (state: RootState) => state.detailedQuest.detailedQuest;
+export const getDetailedQuestError = (state: RootState) => state.detailedQuest.error;
+export const getDetailedQuestLoading = (state: RootState) => state.detailedQuest.isQuestLoading;
+
 
 export const getAuthStatus = (state: RootState) => state.user.authStatus;
 
@@ -11,3 +17,4 @@ export const getBookingSendingState = (state: RootState) => state.booking.isSend
 export const getBookingSlotsError = (state: RootState) => state.booking.error;
 
 export const getReservations = (state: RootState) => state.reservation.reservations;
+export const getReservationError = (state: RootState) => state.reservation.error

@@ -17,7 +17,11 @@ const initialState: QuestsState = {
 const questsSlice = createSlice({
   name: 'quests',
   initialState,
-  reducers: {},
+  reducers: {
+    clearQuestsError(state) {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchQuests.pending, (state) => {
@@ -28,11 +32,12 @@ const questsSlice = createSlice({
         state.quests = action.payload;
         state.isLoading = false;
       })
-      .addCase(fetchQuests.rejected, (state, action) => {
+      .addCase(fetchQuests.rejected, (state) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Ошибка загрузки';
+        state.error = 'Не удалось загрузить список квестов';
       });
   },
 });
 
+export const {clearQuestsError} = questsSlice.actions;
 export default questsSlice.reducer;

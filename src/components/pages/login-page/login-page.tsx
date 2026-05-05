@@ -4,13 +4,22 @@ import {LoginForm} from '../../../types/forms';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch} from '../../../store';
 import {login} from '../../../store/api-actions.ts';
-import {AppRoute, AuthStatus, PASSWORD_LENGTH, validEmail, validPassword} from '../../../const.ts';
-import {Navigate} from 'react-router-dom';
+import {AppRoute, AuthStatus, PASSWORD_LENGTH, VALIDATION_PATTERNS} from '../../../const.ts';
+import {Navigate, useLocation} from 'react-router-dom';
 import {getAuthStatus} from '../../../store/selectors.ts';
 import Spinner from '../../ui/spinner/spinner.tsx';
+
+type LocationState = {
+  from?: {
+    pathname: string;
+  };
+};
 function LoginPage(): ReactElement {
   const dispatch = useDispatch<AppDispatch>();
   const authStatus = useSelector(getAuthStatus);
+  const location = useLocation();
+  const state = location.state as LocationState | null;
+  const previousPage = state?.from?.pathname || AppRoute.Catalogue;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const {
     register,
@@ -24,7 +33,7 @@ function LoginPage(): ReactElement {
   }
 
   if (authStatus === AuthStatus.Auth) {
-    return <Navigate to={AppRoute.Catalogue} replace />;
+    return <Navigate to={previousPage} replace />;
   }
   const handleFormSubmit = (data: LoginForm) => {
     const {email, password} = data;
@@ -69,7 +78,7 @@ function LoginPage(): ReactElement {
                     {...register('email', {
                       required: 'Введите e-mail',
                       pattern: {
-                        value: validEmail,
+                        value: VALIDATION_PATTERNS.email,
                         message: 'Некорректный e-mail'
                       }
                     })}
@@ -100,7 +109,7 @@ function LoginPage(): ReactElement {
                         message: `Пароль должен содержать максимум ${PASSWORD_LENGTH.MAX} символов`
                       },
                       pattern: {
-                        value: validPassword,
+                        value: VALIDATION_PATTERNS.password,
                         message: 'Пароль должен содержать буквы и цифры'
                       }
                     })}
