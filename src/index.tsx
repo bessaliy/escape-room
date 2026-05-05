@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {store} from './store';
 import 'leaflet/dist/leaflet.css';
-import 'css/style.css';
+import './css/style.css';
 
 import App from './components/app/app.tsx';
 
